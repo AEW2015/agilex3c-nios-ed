@@ -45,7 +45,7 @@ return $current_hier
 
 vds::create_system qsys_top
 vds::create_cell -properties { parameters:SDRAM_MHZ {75}  } -vlnv :ip:core_sdram_axi4:1.3 core_sdram_axi4_0
-vds::create_cell -properties { parameters:resetOffset {134217728} parameters:peripheralRegionASize {65536} parameters:peripheralRegionABase {67698688} parameters:instCacheSize {0} parameters:enableBranchPrediction {false} parameters:dataCacheSize {0}  } -vlnv altera.com:ip:intel_niosv_g:4.1.0 intel_niosv_g_4
+vds::create_cell -properties { parameters:resetOffset {134217728} parameters:peripheralRegionASize {262144} parameters:peripheralRegionABase {67698688} parameters:instCacheSize {0} parameters:enableBranchPrediction {false} parameters:dataCacheSize {0}  } -vlnv altera.com:ip:intel_niosv_g:4.1.0 intel_niosv_g_4
 vds::create_cell -properties { parameters:EXPLICIT_CLOCK_RATE {100000000}  } -vlnv altera.com:ip:altera_clock_bridge:19.2.0 proc_clk
 vds::create_cell -vlnv altera.com:ip:altera_reset_bridge:19.2.0 proc_rst
 vds::create_cell -properties { parameters:EXPLICIT_CLOCK_RATE {75000000}  } -vlnv altera.com:ip:altera_clock_bridge:19.2.0 sdram_clock

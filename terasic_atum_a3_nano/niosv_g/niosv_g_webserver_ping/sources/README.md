@@ -129,11 +129,27 @@ b. Using build_sof.py to compile the design
 
 - Run the following command in the terminal from top level project directory:
 ```
-cp custom_logic/emif_axi_adaptor_hw.tcl ./hw
-cp custom_logic/emif_axi_handler.sv ./hw 
+export LM_LICENSE_FILE=/home/dev/License.dat
 quartus_py ./scripts/build_sof.py
 ```
-- The quartus tool will compile the design and generate the output files
+- The build script copies the SDRAM custom-IP files into `hw`, creates
+  `hw/top.qpf` and `hw/top.qsf`, compiles the design, and generates the output
+  files.
+
+If the project is missing the generated Qsys/VDS system files, restore hw/src/vds/qsys_top from the official release package (atum_a3_nano_niosv_g_webserver_ping.zip) before compiling.
+
+For a deterministic hardware build from a clean workspace, this command sequence is validated:
+```
+export LM_LICENSE_FILE=/home/dev/License.dat
+cd hw
+cp ../custom_logic/core_sdram_axi/core_sdram_axi4_hw.tcl .
+cp ../custom_logic/core_sdram_axi/sdram_axi.v .
+cp ../custom_logic/core_sdram_axi/sdram_axi_core.v .
+cp ../custom_logic/core_sdram_axi/sdram_axi_pmem.v .
+quartus_sh -t ../scripts/top.tcl
+quartus_ipgenerate top.qpf
+quartus_sh --flow compile top
+```
 
 c. Creating the bsp, build software sources and download elf
 - To create software app, run the following commands in the terminal:
@@ -141,10 +157,15 @@ c. Creating the bsp, build software sources and download elf
 - Clean the app build project before regenerating elf
 
 ```     
-niosv-bsp --create --no-default --system=./hw/src/vds/qsys_top/qsys_top.vds --quartus_project=./hw/top.qpf --type=freertos -cmd="enable_sw_package altera_freertos_tcpip"  ./sw/bsp_freertos/settings.bsp --script=./sw/bsp_settings.tcl
-niosv-app --bsp-dir=sw/bsp_freertos --app-dir=sw/app_freertos --srcs=sw/app_freertos/main.c
-cmake -S ./sw/app_freertos -B sw/app_freertos/build
-make -C sw/app_freertos/build
+./scripts/build_firmware.sh
+```
+The script regenerates `sw/bsp_freertos` when it is missing, replaces the
+generated AlteraTSE network-interface files with the patched copies in
+`sw/AlteraTSE`, and then builds `sw/app_freertos/build/app_freertos.elf`.
+
+To force BSP regeneration, run:
+```
+FORCE_REGENERATE_BSP=1 ./scripts/build_firmware.sh
 ```
 Note:The software can be compiled using the Ashling Visual Studio Code Extension for Altera FPGAs
 
